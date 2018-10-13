@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
-import { omitChildren } from './helper';
+import { buildFetch, omitChildren } from './helper';
 import isPlainObject from "../utils/isPlainObject";
-import { get, post } from '../../utils/network';
 import shallowEqual from "../utils/shallowEqual";
 
 export default function (mapRequestToProps = () => ({})) {
@@ -22,7 +21,6 @@ export default function (mapRequestToProps = () => ({})) {
           // 初始化requests
           let mapRequest = mappings[propName];
           if (Function.prototype.isPrototypeOf(mapRequest)) {
-            // return makeRequest(mapRequest, true)
             requests[propName] = (params) => {
               let {needState, childRequests} = this.buildRequestByFunctionCall(mapRequest(params));
               // 设置加载状态
@@ -32,8 +30,7 @@ export default function (mapRequestToProps = () => ({})) {
               return this.recursionRequest(childRequests, finalResponses).then((results) => {
                 needState && this.setState((pre) => ({
                   responses: {
-                    ...pre.responses,
-                    ...finalResponses
+                    ...pre.responses, ...finalResponses
                   }
                 }));
                 if (results.length > 1) {
@@ -42,11 +39,13 @@ export default function (mapRequestToProps = () => ({})) {
                   return results[0];
                 }
               }).catch((error) => {
-                needState && this.setState({
-                  responses: {
-                    ...pre.responses,
-                    ...finalResponses
-                  }
+                needState && this.setState((pre) => {
+                  return {
+                    responses: {
+                      ...pre.responses,
+                      ...finalResponses
+                    }
+                  };
                 });
                 throw error;
               });
@@ -144,8 +143,7 @@ export default function (mapRequestToProps = () => ({})) {
           });
           return {
             responses: {
-              ...pre.responses,
-              ...newResponses
+              ...pre.responses, ...newResponses
             }
           };
         });
@@ -158,8 +156,8 @@ export default function (mapRequestToProps = () => ({})) {
             propName,
             request: this.makeRequest({
               url: mapRequest,
-              method: 'get'
-            }),
+              method: 'GET'
+            })
           };
         } else if (isPlainObject(mapRequest)) {
           return {
@@ -211,15 +209,18 @@ export default function (mapRequestToProps = () => ({})) {
 
       makeRequest = (options = {}) => {
         return function () {
-          // Now, only support post and get
-          let promise = options.method === 'post' ? post(options.url, options.params)
-            : get(options.url, options.params);
+          let {url, method, headers, mapResult, then, andThen, ...others} = options;
+          let promise = buildFetch(url, {
+            method,
+            headers,
+            ...others
+          });
           return promise.then((result) => {
             return {
               status: 'success',
               loading: false,
               code: 200,
-              result: options.mapResult ? options.mapResult(result) : result
+              result: mapResult ? mapResult(result) : result
             };
           }).catch((error) => {
             throw {
