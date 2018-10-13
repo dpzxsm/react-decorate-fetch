@@ -1,7 +1,7 @@
 import connect from './connect';
-import { initFetchOptions } from './connect/helper';
+import { initConfig } from './connect/helper';
 
 export {
   connect,
-  initFetchOptions
+  initConfig
 };
