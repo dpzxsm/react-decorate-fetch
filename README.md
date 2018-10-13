@@ -1,2 +1,2 @@
 # react-decorate-fetch
-Very easy for React's fetch Api, separated state and view, similar to react-refetch
+A library for React's fetch Api, very easy to separated state and view, similar to react-refetch
