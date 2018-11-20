@@ -9,7 +9,7 @@ npm i react-decorate-fetch --save
 
 ## API
 
-####interfaces
+#### Interfaces
  
  `FetchConfig: Object`
  ```
