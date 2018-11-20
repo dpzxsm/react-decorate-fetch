@@ -9,13 +9,112 @@ npm i react-decorate-fetch --save
 
 ## API
 
+#### connect(mapRequestToProps: Function)
+It is a HOC to connect React's Component, like react-redux
+###### mapRequestToProps(ownProps)
+ `FetchConfig: Object`
+ ```
+ {
+   "url": string[fetch url],
+   "params": object[query|json],
+   "mapResult": function(result)[map fetch result],
+   "then": function(result)[hook fetch's then, and support return a new FetchConfig]
+ }
+ ```
+ 
+ `FetchResponse: Object`
+ ```
+ {
+    "status": string('success'|'error'|'pending'),
+    "loading": boolean,
+    "code": number,
+    "message": string('only when fetch error')
+    "result": any
+ }
+ 
+ ```
+ `FetchFunction: Function`
+ ```
+  need response State
+ () => ({
+   FetchResponseKey1: (FetchConfig),
+   FetchResponseKey2: (FetchConfig)
+ })
+ 
+ not need response State
+  () => [{
+    FetchConfig1(FetchConfig),
+    FetchConfig2(FetchConfig)
+  }]
+  
+ ```
+ 
+ Map props to Fetch Requests and Responses, arguments is props, and return a Object. The key of the Object is props's name, the value of the Object allow tow type, object and function.
+ 
+ 1. if it is a Object, the component will recieve a Fetch
+ if the return Object's key is
+ 
+
+#### initConfig(options: Object, mapResponse: Function)
+Init fetch config
+###### options
+Special set default fetch config, like headers、cookie、defaultQuery
+###### mapResponse
+Map Response to formate data, like json, default is res.json()
+
 ## Examples
+
+### If you are use decorate fetch
+```javascript
+@connect((props) => ({
+  userFetch:{
+    url: 'http://yourHost/getUserInfo/'+ props.userId,
+    mapResult: result => result.data.userInfo || {}
+  }
+}))
+export class Test extends Comment{
+  render() {
+    let { userFetch } = this.props
+    if(userFetch.status === "success"){
+      this.renderPage()
+    }else if(userFetch.status === 'error'){
+      this.renderError()
+    }else if(userFetch.status === 'pending'){
+      this.renderLoading()
+    }
+  }
+}
+```
+
+### If you don't want use decorate
+```javascript
+class Test extends Comment{
+  render() {
+    let { userFetch } = this.props
+    if(userFetch.status === "success"){
+      this.renderPage()
+    }else if(userFetch.status === 'error'){
+      this.renderError()
+    }else if(userFetch.status === 'pending'){
+      this.renderLoading()
+    }
+  }
+}
+
+export default connect((props) => ({
+  userFetch:{
+    url: 'http://yourHost/getUserInfo/'+ props.userId,
+    mapResult: result => result.data.userInfo || {}
+  }
+}))
+
+````
 
 #### Lazy Request
 ```javascript
 @connect((props) => ({
   userFetch:{
-    url: 'http://XXXXXXXXXXXXX/getUserInfo/'+ props.userId,
+    url: 'http://yourHost/getUserInfo/'+ props.userId,
     mapResult: result => result.data.userInfo || {}
   }
 }))
