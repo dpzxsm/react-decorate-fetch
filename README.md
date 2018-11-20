@@ -9,9 +9,8 @@ npm i react-decorate-fetch --save
 
 ## API
 
-#### connect(mapRequestToProps: Function)
-It is a HOC to connect React's Component, like react-redux
-###### mapRequestToProps(ownProps)
+####interfaces
+ 
  `FetchConfig: Object`
  ```
  {
@@ -48,13 +47,14 @@ It is a HOC to connect React's Component, like react-redux
   }]
   
  ```
- 
- Map props to Fetch Requests and Responses, arguments is props, and return a Object. The key of the Object is props's name, the value of the Object allow tow type, object and function.
- 
- 1. if it is a Object, the component will recieve a Fetch
- if the return Object's key is
- 
 
+#### connect(mapRequestToProps: Function)
+It is a HOC to connect React's Component, like react-redux
+###### mapRequestToProps(ownProps)
+ Map props to Fetch Requests and Responses, arguments is props, and return a Object. The key of the Object is props's name, the value of the Object allow tow type, object and function.
+ 1. if the return Object's value is a Object as `FetchConfig`, will recieve a `FetchResponse` as props
+ 2. if the return Object's value is a function return a Object as `FetchConfig` , will recieve a `FetchFunction` as props
+ 
 #### initConfig(options: Object, mapResponse: Function)
 Init fetch config
 ###### options
