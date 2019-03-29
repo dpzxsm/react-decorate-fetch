@@ -4,7 +4,11 @@ import { buildFetch, omitChildren } from './helper';
 import isPlainObject from "../utils/isPlainObject";
 import shallowEqual from "../utils/shallowEqual";
 
-export default function (mapRequestToProps = () => ({})) {
+export default function (mapRequestToProps) {
+  mapRequestToProps = mapRequestToProps || (() => ({}));
+  if (isPlainObject(mapRequestToProps)) {
+    mapRequestToProps = () => mapRequestToProps;
+  }
   return function (WrappedComponent) {
     class ConnectComponent extends Component {
       constructor(props, context) {
@@ -22,7 +26,7 @@ export default function (mapRequestToProps = () => ({})) {
           let mapRequest = mappings[propName];
           if (Function.prototype.isPrototypeOf(mapRequest)) {
             requests[propName] = (params) => {
-              let {needState, childRequests} = this.buildRequestByFunctionCall(mapRequest(params));
+              let { needState, childRequests } = this.buildRequestByFunctionCall(mapRequest(params));
               // 设置加载状态
               needState && this.initialResponsesState(childRequests);
               // 递归请求接口
@@ -185,7 +189,7 @@ export default function (mapRequestToProps = () => ({})) {
 
 
       componentDidMount() {
-        let {lazyRequest, responses} = this.state;
+        let { lazyRequest, responses } = this.state;
         // 没有懒加载的话，就返回，防止不必要的渲染
         if (lazyRequest.length === 0) return;
         let finalResponses = Object.assign({}, responses);
@@ -209,7 +213,7 @@ export default function (mapRequestToProps = () => ({})) {
 
       makeRequest = (options = {}) => {
         return function () {
-          let {url, method, headers, mapResult, then, andThen, ...others} = options;
+          let { url, method, headers, mapResult, then, andThen, ...others } = options;
           let promise = buildFetch(url, {
             method,
             headers,
