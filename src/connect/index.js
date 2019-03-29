@@ -231,7 +231,7 @@ export default function (mapRequestToProps) {
             throw {
               status: 'error',
               loading: false,
-              code: error.code,
+              code: error.code || 0,
               message: error.message
             };
           });
