@@ -7,7 +7,8 @@ import shallowEqual from "../utils/shallowEqual";
 export default function (mapRequestToProps) {
   mapRequestToProps = mapRequestToProps || (() => ({}));
   if (isPlainObject(mapRequestToProps)) {
-    mapRequestToProps = () => mapRequestToProps;
+    let mapRequest = Object.assign({}, mapRequestToProps);
+    mapRequestToProps = () => mapRequest;
   }
   return function (WrappedComponent) {
     class ConnectComponent extends Component {
