@@ -225,7 +225,7 @@ export default function (mapRequestToProps) {
               status: 'success',
               loading: false,
               code: 200,
-              result: mapResult ? mapResult(result) : result
+              data: mapResult ? mapResult(result) : result
             };
           }).catch((error) => {
             throw {
