@@ -16,7 +16,7 @@ const defaults = {
 };
 
 function omitChildren(obj) {
-  const {children, ...rest} = obj;
+  const { children, ...rest } = obj;
   return rest;
 }
 
@@ -54,7 +54,7 @@ function buildFetch(url, options = {}) {
       topFetch = self.fetch.bind(self);
     }
   }
-  let {params = {}, ...otherOptions} = options;
+  let { params = {}, ...otherOptions } = options;
   let fetchOptions = defaults.fetchOptions;
   otherOptions.headers = Object.assign({}, options.headers || {}, fetchOptions.headers);
   otherOptions.method = options.method || fetchOptions.method;
@@ -67,13 +67,15 @@ function buildFetch(url, options = {}) {
         url = url + '?' + buildQuery(params);
       }
     }
+  } else if (otherOptions.method === 'POST' && Object.keys(params).length > 0) {
+    otherOptions.body = params
   }
   return fetch(url, otherOptions).then((res) => {
     return defaults.buildResponse(res);
   });
 }
 
-function initConfig({options = {}, mapResponse}) {
+function initConfig({ options = {}, mapResponse }) {
   if (typeof options === 'object') {
     defaults.fetchOptions = Object.assign(defaults.fetchOptions, options);
   }
