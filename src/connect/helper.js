@@ -94,10 +94,13 @@ function initConfig({ options = {}, mapResponse }) {
 function bindDomClick(func) {
   return function (event) {
     // get params from event
-    let dataset = event.currentTarget.dataset || {};
-    let params = {
-      ...dataset
-    };
+    let params = {};
+    if (event && event.currentTarget) {
+      let dataset = event.currentTarget.dataset || {};
+      params = {
+        ...dataset
+      };
+    }
     return func(params);
   };
 }
