@@ -22,7 +22,7 @@ function omitChildren(obj) {
 
 function buildQuery(params) {
   let esc = encodeURIComponent;
-  let query = Object.keys(params)
+  return Object.keys(params)
     .map(k => {
       if (Array.isArray(params[k])) {
         let key = k;
@@ -36,7 +36,6 @@ function buildQuery(params) {
       }
     })
     .join('&');
-  return query;
 }
 
 function buildFetch(url, options = {}) {
@@ -56,6 +55,9 @@ function buildFetch(url, options = {}) {
   }
   let { params = {}, ...otherOptions } = options;
   let { host, ...fetchOptions } = defaults.fetchOptions;
+  if (!url.match(/https?:\/\//) && host) {
+    url = host + url;
+  }
   otherOptions.headers = Object.assign({}, options.headers || {}, fetchOptions.headers);
   otherOptions.method = options.method || fetchOptions.method;
   if (otherOptions.method === 'GET') {
@@ -69,9 +71,6 @@ function buildFetch(url, options = {}) {
     }
   } else if (otherOptions.method === 'POST' && Object.keys(params).length > 0) {
     otherOptions.body = params;
-  }
-  if (!url.match(/https?:\/\//) && host) {
-    url = host + url;
   }
   return fetch(url, otherOptions).then((res) => {
     return defaults.buildResponse(res);
