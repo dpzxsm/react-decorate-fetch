@@ -3,7 +3,7 @@ const defaults = {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json'
     }
   },
   buildResponse: function (res) {
