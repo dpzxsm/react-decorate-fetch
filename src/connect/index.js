@@ -224,6 +224,8 @@ export default function (mapRequestToProps) {
             return {
               status: 'success',
               loading: false,
+              error: false,
+              success: true,
               code: 200,
               data: mapResult ? mapResult(result) : result
             };
@@ -231,6 +233,8 @@ export default function (mapRequestToProps) {
             throw {
               status: 'error',
               loading: false,
+              error: true,
+              success: false,
               code: error.code || 0,
               message: error.message
             };

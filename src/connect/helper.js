@@ -8,7 +8,13 @@ const defaults = {
   },
   buildResponse: function (res) {
     if (res && res.json) {
-      return res.json();
+      return res.json().then((dataOrError) => {
+        if (res.ok) {
+          return dataOrError;
+        } else {
+          throw dataOrError;
+        }
+      });
     } else {
       return {};
     }
@@ -27,8 +33,7 @@ function buildQuery(params) {
       if (Array.isArray(params[k])) {
         let key = k;
         let items = params[k].map(item => {
-          let result = esc(key + '[]') + '=' + esc(item);
-          return result;
+          return esc(key + '[]') + '=' + esc(item);
         });
         return items.join('&');
       } else {
