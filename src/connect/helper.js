@@ -74,8 +74,8 @@ function buildFetch(url, options = {}) {
         url = url + '?' + buildQuery(params);
       }
     }
-  } else if (otherOptions.method === 'POST' && Object.keys(params).length > 0) {
-    otherOptions.body = params;
+  } else if (otherOptions.method === 'POST') {
+    otherOptions.body = JSON.parse(params);
   }
   return fetch(url, otherOptions).then((res) => {
     return defaults.buildResponse(res);
