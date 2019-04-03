@@ -1,7 +1,8 @@
 import connect from './connect';
-import { initConfig } from './connect/helper';
+import { initConfig, bindDomClick } from './connect/helper';
 
 export {
   connect,
+  bindDomClick,
   initConfig
 };

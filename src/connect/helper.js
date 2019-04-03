@@ -91,8 +91,20 @@ function initConfig({ options = {}, mapResponse }) {
   }
 }
 
+function bindDomClick(func) {
+  return function (event) {
+    // get params from event
+    let dataset = event.currentTarget.dataset || {};
+    let params = {
+      ...dataset
+    };
+    return func(params);
+  };
+}
+
 export {
   omitChildren,
   buildFetch,
   initConfig,
+  bindDomClick
 };
