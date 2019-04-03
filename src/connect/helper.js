@@ -75,7 +75,7 @@ function buildFetch(url, options = {}) {
       }
     }
   } else if (otherOptions.method === 'POST') {
-    otherOptions.body = JSON.parse(params);
+    otherOptions.body = JSON.stringify(params);
   }
   return fetch(url, otherOptions).then((res) => {
     return defaults.buildResponse(res);
