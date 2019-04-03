@@ -55,7 +55,7 @@ function buildFetch(url, options = {}) {
     }
   }
   let { params = {}, ...otherOptions } = options;
-  let fetchOptions = defaults.fetchOptions;
+  let { host, ...fetchOptions } = defaults.fetchOptions;
   otherOptions.headers = Object.assign({}, options.headers || {}, fetchOptions.headers);
   otherOptions.method = options.method || fetchOptions.method;
   if (otherOptions.method === 'GET') {
@@ -68,7 +68,10 @@ function buildFetch(url, options = {}) {
       }
     }
   } else if (otherOptions.method === 'POST' && Object.keys(params).length > 0) {
-    otherOptions.body = params
+    otherOptions.body = params;
+  }
+  if (!url.match(/https?:\/\//) && host) {
+    url = host + url;
   }
   return fetch(url, otherOptions).then((res) => {
     return defaults.buildResponse(res);
