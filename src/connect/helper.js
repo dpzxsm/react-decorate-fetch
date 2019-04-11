@@ -69,7 +69,8 @@ function buildFetch(url, options = {}) {
       topFetch = self.fetch.bind(self);
     }
   }
-  let { params = {}, ...otherOptions } = filterOptions(options);
+  let { params = {}, ...otherOptions } = options;
+  otherOptions = filterOptions(otherOptions);
   let { host, ...fetchOptions } = defaults.fetchOptions;
   if (!url.match(/https?:\/\//) && host) {
     url = host + url;
