@@ -83,7 +83,7 @@ export default function (mapRequestToProps) {
               finalResponses[item.propName] = response;
             }
             if (item.then) {
-              let mixRequest = this.buildRequestByFunctionCall(item.then(response));
+              let mixRequest = this.buildRequestByFunctionCall(item.then(response.data));
               return this.recursionRequest(mixRequest.childRequests, finalResponses, results, false).then((result) => {
                 if (result.length > 1) {
                   results[index] = result;
@@ -95,9 +95,9 @@ export default function (mapRequestToProps) {
               });
             }
             if (isFirst) {
-              results[index] = response || {};
+              results[index] = response.data || {};
             }
-            return response || {};
+            return response.data || {};
           }).catch((error) => {
             if (item.propName) {
               finalResponses[item.propName] = error;
