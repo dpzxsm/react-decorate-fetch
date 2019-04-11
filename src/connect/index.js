@@ -3,6 +3,7 @@ import hoistStatics from 'hoist-non-react-statics';
 import { buildFetch, omitChildren } from './helper';
 import isPlainObject from "../utils/isPlainObject";
 import shallowEqual from "../utils/shallowEqual";
+import { compose } from "./middleware.js";
 
 export default function (mapRequestToProps) {
   mapRequestToProps = mapRequestToProps || (() => ({}));
@@ -215,29 +216,41 @@ export default function (mapRequestToProps) {
       makeRequest = (options = {}) => {
         return function () {
           let { url, method, headers, mapResult, then, andThen, ...others } = options;
-          let promise = buildFetch(url, {
+          let context = [url, {
             method,
             headers,
             ...others
-          });
-          return promise.then((result) => {
-            return {
-              status: 'success',
-              loading: false,
-              error: false,
-              success: true,
-              code: 200,
-              data: mapResult ? mapResult(result) : result
-            };
-          }).catch((error) => {
-            throw {
-              status: 'error',
-              loading: false,
-              error: true,
-              success: false,
-              code: error.code || 0,
-              message: error.message
-            };
+          }];
+          return new Promise((resolve, reject) => {
+            compose('before')(context, () => {
+              buildFetch(...context).then((result) => {
+                return {
+                  status: 'success',
+                  loading: false,
+                  error: false,
+                  success: true,
+                  code: 200,
+                  data: mapResult ? mapResult(result) : result
+                };
+              }).catch((error) => {
+                return {
+                  status: 'error',
+                  loading: false,
+                  error: true,
+                  success: false,
+                  code: error.code || 0,
+                  message: error.message
+                };
+              }).then(data => {
+                compose('after')(data, () => {
+                  if (data.error) {
+                    reject(data);
+                  } else {
+                    resolve(data);
+                  }
+                });
+              });
+            });
           });
         };
       };
