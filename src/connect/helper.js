@@ -103,11 +103,8 @@ function initConfig({ options = {}, mapResponse }) {
   }
 }
 
-function bindDomClick(func, disabled) {
+function bindDomClick(func, verification) {
   return function (event) {
-    if (disabled) {
-      return;
-    }
     // get params from event
     let params = {};
     if (event && event.currentTarget) {
@@ -115,6 +112,13 @@ function bindDomClick(func, disabled) {
       params = {
         ...dataset
       };
+    }
+    if (verification) {
+      if (typeof verification === 'function') {
+        if (!verification(params)) return;
+      } else {
+        return;
+      }
     }
     return func(params);
   };
