@@ -219,16 +219,10 @@ export default function (mapRequestToProps) {
 
       makeRequest = (options = {}) => {
         return function () {
-          let { url, method, headers, mapResult, isLazy, successText, then, andThen, ...others } = options;
-          let context = [url, {
-            method,
-            headers,
-            isLazy,
-            ...others
-          }];
+          let { url, mapResult, successText, ...otherOptions } = options;
           return new Promise((resolve, reject) => {
-            compose('before')(context, () => {
-              buildFetch(...context).then((result) => {
+            compose('before')([options], () => {
+              buildFetch(url, otherOptions).then((result) => {
                 return {
                   status: 'success',
                   loading: false,
@@ -245,11 +239,10 @@ export default function (mapRequestToProps) {
                   error: true,
                   success: false,
                   code: error.code || 0,
-                  message: error.message,
-                  isLazy
+                  message: error.message
                 };
               }).then(data => {
-                compose('after')(data, () => {
+                compose('after')([options, data], () => {
                   if (data.error) {
                     reject(data);
                   } else {

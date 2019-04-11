@@ -21,6 +21,8 @@ const defaults = {
   }
 };
 
+const fetchInitKeys = ['method', 'headers', 'body', 'mode', 'credentials', 'cache', 'redirect', 'referrer', 'referrerPolicy', 'integrity'];
+
 function omitChildren(obj) {
   const { children, ...rest } = obj;
   return rest;
@@ -43,6 +45,15 @@ function buildQuery(params) {
     .join('&');
 }
 
+function filterOptions(options) {
+  return Object.keys(options).reduce((data, key) => {
+    if (fetchInitKeys.indexOf(key) !== -1) {
+      data[key] = options[key];
+    }
+    return data;
+  }, {});
+}
+
 function buildFetch(url, options = {}) {
   let topFetch;
   if (typeof window !== 'undefined') {
@@ -58,7 +69,7 @@ function buildFetch(url, options = {}) {
       topFetch = self.fetch.bind(self);
     }
   }
-  let { params = {}, ...otherOptions } = options;
+  let { params = {}, ...otherOptions } = filterOptions(options);
   let { host, ...fetchOptions } = defaults.fetchOptions;
   if (!url.match(/https?:\/\//) && host) {
     url = host + url;
