@@ -4,6 +4,12 @@ const middlewares = [];
  * 添加中间件
  */
 export function applyMiddleware(plugin) {
+  // check middlewares
+  Object.keys(plugin).forEach((key) => {
+    if (typeof plugin[key] !== "function") {
+      throw new Error("The Middleware's action must be function!");
+    }
+  });
   middlewares.push(plugin);
 }
 
@@ -14,6 +20,10 @@ export function removeMiddleware(plugin) {
   }
 }
 
+const defaultNext = function () {
+  // do nothing
+};
+
 export function compose(action) {
   return function (context, next) {
     // last called middleware #
@@ -23,7 +33,7 @@ export function compose(action) {
     function dispatch(i) {
       if (i <= index) return Promise.reject(new Error('next() called multiple times'));
       index = i;
-      let fn = middlewares[i][action];
+      let fn = middlewares[i] ? (middlewares[i][action] || defaultNext) : undefined;
       if (i === middlewares.length) fn = next;
       if (!fn) return Promise.resolve();
       try {
