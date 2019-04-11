@@ -1,8 +1,9 @@
 import connect from './connect';
-import { initConfig, bindDomClick } from './connect/helper';
+import { initConfig, buildFetch, bindDomClick } from './connect/helper';
 
 export {
   connect,
+  buildFetch,
   bindDomClick,
   initConfig
 };
