@@ -223,6 +223,7 @@ export default function (mapRequestToProps) {
           let context = [url, {
             method,
             headers,
+            isLazy,
             ...others
           }];
           return new Promise((resolve, reject) => {
@@ -235,7 +236,6 @@ export default function (mapRequestToProps) {
                   success: true,
                   code: 200,
                   data: mapResult ? mapResult(result) : result,
-                  isLazy
                 };
               }).catch((error) => {
                 return {
