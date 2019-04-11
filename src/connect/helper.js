@@ -91,8 +91,11 @@ function initConfig({ options = {}, mapResponse }) {
   }
 }
 
-function bindDomClick(func) {
+function bindDomClick(func, disabled) {
   return function (event) {
+    if (disabled) {
+      return;
+    }
     // get params from event
     let params = {};
     if (event && event.currentTarget) {
