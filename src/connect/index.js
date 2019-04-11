@@ -58,7 +58,7 @@ export default function (mapRequestToProps) {
             };
           } else {
             // 添加至懒加载队列
-            lazyRequest.push(this.mapRequestByType(propName, mapRequest));
+            lazyRequest.push(this.mapRequestByType(propName, mapRequest, true));
             // 初始化responses
             responses[propName] = {
               status: 'pending',
@@ -155,21 +155,25 @@ export default function (mapRequestToProps) {
         });
       };
 
-      mapRequestByType = (propName, mapRequest) => {
+      mapRequestByType = (propName, mapRequest, isLazy = false) => {
         if (typeof mapRequest === "string") {
           // default request
           return {
             propName,
             request: this.makeRequest({
               url: mapRequest,
-              method: 'GET'
+              method: 'GET',
+              isLazy
             })
           };
         } else if (isPlainObject(mapRequest)) {
           return {
             propName,
             then: mapRequest.then,
-            request: this.makeRequest(mapRequest)
+            request: this.makeRequest({
+              ...mapRequest,
+              isLazy
+            })
           };
         } else {
           return {
@@ -215,7 +219,7 @@ export default function (mapRequestToProps) {
 
       makeRequest = (options = {}) => {
         return function () {
-          let { url, method, headers, mapResult, then, andThen, ...others } = options;
+          let { url, method, headers, mapResult, isLazy, then, andThen, ...others } = options;
           let context = [url, {
             method,
             headers,
@@ -230,7 +234,8 @@ export default function (mapRequestToProps) {
                   error: false,
                   success: true,
                   code: 200,
-                  data: mapResult ? mapResult(result) : result
+                  data: mapResult ? mapResult(result) : result,
+                  isLazy
                 };
               }).catch((error) => {
                 return {
@@ -239,7 +244,8 @@ export default function (mapRequestToProps) {
                   error: true,
                   success: false,
                   code: error.code || 0,
-                  message: error.message
+                  message: error.message,
+                  isLazy
                 };
               }).then(data => {
                 compose('after')(data, () => {
