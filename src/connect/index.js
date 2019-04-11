@@ -219,7 +219,7 @@ export default function (mapRequestToProps) {
 
       makeRequest = (options = {}) => {
         return function () {
-          let { url, method, headers, mapResult, isLazy, then, andThen, ...others } = options;
+          let { url, method, headers, mapResult, isLazy, successText, then, andThen, ...others } = options;
           let context = [url, {
             method,
             headers,
@@ -235,6 +235,7 @@ export default function (mapRequestToProps) {
                   error: false,
                   success: true,
                   code: 200,
+                  message: successText || '请求成功',
                   data: mapResult ? mapResult(result) : result,
                 };
               }).catch((error) => {
