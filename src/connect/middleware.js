@@ -20,8 +20,9 @@ export function removeMiddleware(plugin) {
   }
 }
 
-const defaultNext = function () {
+const defaultNext = function (context, next) {
   // do nothing
+  next();
 };
 
 export function compose(action) {
