@@ -77,7 +77,8 @@ function buildFetch(url, options = {}) {
   }
   otherOptions.headers = Object.assign({}, options.headers || {}, fetchOptions.headers);
   otherOptions.method = options.method || fetchOptions.method;
-  params = Object.assign({}, params, fetchOptions.params || {});
+  let globalParams = fetchOptions.buildParams ? fetchOptions.buildParams() : {};
+  params = Object.assign({}, params, globalParams);
   if (otherOptions.method === 'GET') {
     let query = buildQuery(params);
     if (query) {
