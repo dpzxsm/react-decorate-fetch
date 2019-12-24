@@ -1,3 +1,5 @@
+import { compose } from "./middleware.js";
+
 const defaults = {
   fetchOptions: {
     method: 'GET',
@@ -54,7 +56,7 @@ function filterOptions(options) {
   }, {});
 }
 
-function buildFetch(url, options = {}) {
+function getTopFetch() {
   let topFetch;
   if (typeof window !== 'undefined') {
     if (window.fetch) {
@@ -69,7 +71,12 @@ function buildFetch(url, options = {}) {
       topFetch = self.fetch.bind(self);
     }
   }
-  let { params = {}, ...otherOptions } = options;
+  return topFetch;
+}
+
+function buildFetch(url, options = {}) {
+  let topFetch = getTopFetch();
+  let { params = {}, isForm, ...otherOptions } = options;
   otherOptions = filterOptions(otherOptions);
   let { host, ...fetchOptions } = defaults.fetchOptions;
   if (!url.match(/https?:\/\//) && host) {
@@ -77,7 +84,7 @@ function buildFetch(url, options = {}) {
   }
   otherOptions.headers = Object.assign({}, options.headers || {}, fetchOptions.headers);
   otherOptions.method = options.method || fetchOptions.method;
-  let globalParams = fetchOptions.buildParams ? fetchOptions.buildParams() : {};
+  let globalParams = fetchOptions.globalParams ? fetchOptions.globalParams : {};
   params = Object.assign({}, params, globalParams);
   if (otherOptions.method === 'GET') {
     let query = buildQuery(params);
@@ -88,10 +95,20 @@ function buildFetch(url, options = {}) {
         url = url + '?' + buildQuery(params);
       }
     }
-  } else if (otherOptions.method === 'POST') {
-    otherOptions.body = JSON.stringify(params);
+  } else if (otherOptions.method === 'POST' && !otherOptions.body) {
+    if (otherOptions.transformFormData)
+      if (isForm) {
+        let formData = new FormData();
+        Object.keys(params).forEach(key => {
+          formData.append(key, params[key]);
+        });
+        otherOptions.body = formData;
+      } else {
+        // default transform json
+        otherOptions.body = JSON.stringify(params);
+      }
   }
-  return fetch(url, otherOptions).then((res) => {
+  return topFetch(url, otherOptions).then((res) => {
     return defaults.buildResponse(res);
   });
 }

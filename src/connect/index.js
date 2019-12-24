@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
-import { buildFetch, omitChildren } from './helper';
+import { omitChildren } from '../utils/helper';
 import isPlainObject from "../utils/isPlainObject";
 import shallowEqual from "../utils/shallowEqual";
-import { compose } from "./middleware.js";
+import { mapRequestByOptions } from "../utils/mapRequest";
 
-export default function (mapRequestToProps) {
+export default function (mapRequestToProps, defaults, options) {
   mapRequestToProps = mapRequestToProps || (() => ({}));
   if (isPlainObject(mapRequestToProps)) {
     let mapRequest = Object.assign({}, mapRequestToProps);
     mapRequestToProps = () => mapRequest;
   }
+  defaults = Object.assign({}, defaults);
+  options = Object.assign({ withRef: false }, options);
   return function (WrappedComponent) {
     class ConnectComponent extends Component {
       constructor(props, context) {
@@ -23,114 +25,53 @@ export default function (mapRequestToProps) {
         let lazyRequest = [];
         let requests = {};
         let responses = {};
-        Object.keys(mappings).forEach((propName) => {
-          // 初始化requests
-          let mapRequest = mappings[propName];
-          if (Function.prototype.isPrototypeOf(mapRequest)) {
-            requests[propName] = (params) => {
-              let { needState, childRequests } = this.buildRequestByFunctionCall(mapRequest(params));
-              // 设置加载状态
-              needState && this.initialResponsesState(childRequests);
-              // 递归请求接口
+        Object.keys(mappings).forEach((key) => {
+          let options = mappings[key];
+          if (Function.prototype.isPrototypeOf(options)) {
+            requests[key] = (params) => {
+              let childMappings = options(params);
+              let childRequests = Object.keys(childMappings).map(key => {
+                let request = mapRequestByOptions(childMappings[key]);
+                return ({
+                  key,
+                  request
+                });
+              });
+              this.initialResponsesState(childRequests);
               let finalResponses = {};
-              return this.recursionRequest(childRequests, finalResponses).then((results) => {
-                needState && this.setState((pre) => ({
+              return Promise.all(childRequests.map(item => {
+                return item.request().then(response => {
+                  finalResponses[item.key] = response;
+                  return response;
+                });
+              })).then((results) => {
+                this.setState((pre) => ({
                   responses: {
                     ...pre.responses, ...finalResponses
                   }
                 }));
-                if (results.length > 1) {
+                if (results.length > 0) {
                   return results;
                 } else {
                   return results[0];
                 }
-              }).catch((error) => {
-                needState && this.setState((pre) => {
-                  return {
-                    responses: {
-                      ...pre.responses,
-                      ...finalResponses
-                    }
-                  };
-                });
-                throw error;
               });
             };
           } else {
-            // 添加至懒加载队列
-            lazyRequest.push(this.mapRequestByType(propName, mapRequest, true));
-            // 初始化responses
-            responses[propName] = {
+            responses[key] = {
               status: 'pending',
-              loading: true,
-              code: 0
+              loading: false
             };
+            lazyRequest.push({
+              key,
+              request: mapRequestByOptions(options)
+            });
           }
         });
-        // 初始状态
         return {
           lazyRequest,
           requests,
           responses
-        };
-      };
-
-      // 递归调用获取Request，保证异步请求同步执行
-      recursionRequest = (childRequests = [], finalResponses = {}, results = [], isFirst = true) => {
-        return Promise.all(childRequests.map((item, index) => {
-          return item.request().then(response => {
-            if (item.propName) {
-              finalResponses[item.propName] = response;
-            }
-            if (item.then) {
-              let mixRequest = this.buildRequestByFunctionCall(item.then(response.data));
-              return this.recursionRequest(mixRequest.childRequests, finalResponses, results, false).then((result) => {
-                if (result.length > 1) {
-                  results[index] = result;
-                  return result;
-                } else {
-                  results[index] = result[0];
-                  return result[0];
-                }
-              });
-            }
-            if (isFirst) {
-              results[index] = response.data || {};
-            }
-            return response.data || {};
-          }).catch((error) => {
-            if (item.propName) {
-              finalResponses[item.propName] = error;
-            }
-            throw  error;
-          });
-        }));
-      };
-
-      //构建Request
-      buildRequestByFunctionCall = (requestObj) => {
-        let childRequests = [];
-        let needState = false;
-        if (typeof requestObj === 'string') {
-          // 如果返回的是一个String，默认get请求，并且没有State
-          childRequests.push(this.mapRequestByType(null, requestObj));
-        } else if (isPlainObject(requestObj)) {
-          // 如果返回的是一个Object的话，就认为是异步请求，需要把所有的子请求全部便利出来
-          // 需要setState
-          childRequests = Object.keys(requestObj).map((key) => {
-            return this.mapRequestByType(key, requestObj[key]);
-          });
-          needState = true;
-        } else if (Array.isArray(requestObj)) {
-          // 如果返回的是一个数组的话，也认为是异步请求，需要把所有的子请求全部便利出来
-          // 不需要setState
-          childRequests = requestObj.map((item) => {
-            return this.mapRequestByType(null, item);
-          });
-        }
-        return {
-          needState,
-          childRequests
         };
       };
 
@@ -139,11 +80,10 @@ export default function (mapRequestToProps) {
         this.setState((pre) => {
           let newResponses = {};
           requests.forEach((item) => {
-            if (item.propName) {
-              newResponses[item.propName] = {
-                status: 'pending',
-                loading: true,
-                code: 0
+            if (item.key) {
+              newResponses[item.key] = {
+                status: 'loading',
+                loading: true
               };
             }
           });
@@ -155,36 +95,8 @@ export default function (mapRequestToProps) {
         });
       };
 
-      mapRequestByType = (propName, mapRequest, isLazy = false) => {
-        if (typeof mapRequest === "string") {
-          // default request
-          return {
-            propName,
-            request: this.makeRequest({
-              url: mapRequest,
-              method: 'GET',
-              isLazy
-            })
-          };
-        } else if (isPlainObject(mapRequest)) {
-          return {
-            propName,
-            then: mapRequest.then,
-            request: this.makeRequest({
-              ...mapRequest,
-              isLazy
-            })
-          };
-        } else {
-          return {
-            propName: null,
-            request: () => Promise.reject("Not Support the Request Type")
-          };
-        }
-      };
-
-      componentWillReceiveProps(nextProps) {
-        if (!shallowEqual(nextProps, this.props)) {
+      componentDidUpdate(prevProps) {
+        if (!shallowEqual(prevProps, this.props)) {
           // 因为props发生了变化，所以更新requests
           let newState = this.refactorMapRequestToState(mapRequestToProps(omitChildren(nextProps)));
           this.setState({
@@ -192,7 +104,6 @@ export default function (mapRequestToProps) {
           });
         }
       }
-
 
       componentDidMount() {
         let { lazyRequest, responses } = this.state;
@@ -202,9 +113,9 @@ export default function (mapRequestToProps) {
         // 设置成功和失败
         Promise.all(lazyRequest.map(item => {
           return item.request().then((response) => {
-            finalResponses[item.propName] = response;
+            finalResponses[item.key] = response;
           }).catch((error) => {
-            finalResponses[item.propName] = error;
+            finalResponses[item.key] = error;
           });
         })).then(() => {
           this.setState({
@@ -217,49 +128,13 @@ export default function (mapRequestToProps) {
         });
       }
 
-      makeRequest = (options = {}) => {
-        return function () {
-          let { url, mapResult, successText, ...otherOptions } = options;
-          return new Promise((resolve, reject) => {
-            compose('before')([options], () => {
-              buildFetch(url, otherOptions).then((result) => {
-                return {
-                  status: 'success',
-                  loading: false,
-                  error: false,
-                  success: true,
-                  code: 200,
-                  message: successText || '请求成功',
-                  data: mapResult ? mapResult(result) : result,
-                };
-              }).catch((error) => {
-                return {
-                  status: 'error',
-                  loading: false,
-                  error: true,
-                  success: false,
-                  code: error.code || 0,
-                  message: error.message
-                };
-              }).then(data => {
-                compose('after')([options, data], () => {
-                  if (data.error) {
-                    reject(data);
-                  } else {
-                    resolve(data);
-                  }
-                });
-              });
-            });
-          });
-        };
-      };
-
       render() {
+        const ref = options.withRef ? 'wrappedInstance' : null;
         return <WrappedComponent
           {...this.state.responses}
           {...this.state.requests}
           {...this.props}
+          ref={ref}
         />;
       }
     }

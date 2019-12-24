@@ -1,11 +1,11 @@
 {
   "name": "react-decorate-fetch",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "A library for React's fetch Api, very easy to separated state and view, similar to react-refetch",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d lib"
+    "build": "babel src -d lib -s true"
   },
   "repository": {
     "type": "git",
@@ -29,15 +29,14 @@
     "react-native": "*"
   },
   "dependencies": {
-    "hoist-non-react-statics": "^3.0.1",
-    "react": "^16.5.2"
+    "hoist-non-react-statics": "^3.0.1"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-decorators-legacy": "1.3.5",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1"
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-proposal-decorators": "^7.7.4",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-react": "^7.7.4"
   }
 }

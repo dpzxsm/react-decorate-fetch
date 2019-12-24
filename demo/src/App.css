@@ -1,0 +1,10 @@
+.App{
+    padding: 16px;
+}
+.App *{
+    margin: 0;
+    padding: 0;
+}
+
+.info span{
+}
