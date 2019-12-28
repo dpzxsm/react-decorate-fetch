@@ -164,9 +164,9 @@ removeMiddleware(plugin)
 | **url**       | String   | The Fetch API’s url, if `value` is Static, it is not required.| true | —— |
 | **method**    | String   | The Fetch API’s method | false | "GET" |
 | **headers**   | Object   | The Fetch API’s headers | false | { 'Accept': 'application/json', 'Content-Type': 'application/json' } |
-| **params**    | Object   | Common params for different `method`, look more| false | {} |
+| **params**    | Object   | Common params for different `method`| false | {} |
 | **value**     | Function\|Any | Static response’s value or function to transform the old response’s value, look more | false | —— |
-| **then**      | Function | Chaining Requests, look more | false | —— |
+| **then**      | Function | Chaining Requests | false | —— |
 | **host**      | String   | Define the host, only use in [initConfig](#initConfig) | false | —— |
 | **globalParams**| String | Define default params, only use in [initConfig](#initConfig) | false | —— |
 
