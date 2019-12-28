@@ -1,7 +1,7 @@
 {
   "name": "react-decorate-fetch",
   "version": "2.0.0",
-  "description": "A library for React's fetch Api, very easy to separated state and view, similar to react-refetch",
+  "description": "A library to fetch data for React Components, which has most of the similar API with [react-refetch] Different, it also supports more friendly way to use, like Hooks.",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
