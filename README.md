@@ -1,4 +1,4 @@
-#react-decorate-fetch
+# react-decorate-fetch [![npm version](https://badge.fury.io/js/react-decorate-fetch.svg)](https://badge.fury.io/js/react-decorate-fetch)
 A library to fetch data for React Components, which has most of the similar API with [react-refetch](https://github.com/heroku/react-refetch). Different, it also supports more friendly way to use, like Hooks.
 
 ## Installation
