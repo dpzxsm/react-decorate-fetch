@@ -1,5 +1,5 @@
 import connect from './connect';
-import { initConfig, buildFetch, bindDomClick } from './utils/helper';
+import { initConfig, buildFetch } from './utils/helper';
 import { applyMiddleware, removeMiddleware } from './utils/middleware';
 import useFetch from './hooks/useFetch';
 import useLazyFetch from './hooks/useLazyFetch';
@@ -11,7 +11,6 @@ export {
   useLazyFetch,
   useLazyFetches,
   buildFetch,
-  bindDomClick,
   initConfig,
   applyMiddleware,
   removeMiddleware

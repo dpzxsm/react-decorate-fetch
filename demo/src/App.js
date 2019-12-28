@@ -1,19 +1,34 @@
 import React, { useCallback, useState } from 'react';
 import './App.css';
-import { initConfig, connect, useLazyFetch, useFetch, useLazyFetches } from 'react-decorate-fetch';
+import { initConfig, connect, useLazyFetch, useFetch, applyMiddleware } from 'react-decorate-fetch';
 // import { connect} from 'react-refetch'
 
 // similar to react-refetch's connect.defaults
 initConfig({
-  options: {
+  fetchOptions: {
     host: 'http://' + process.env.HOST // replace your host
   }
 });
 
+// hook fetch result
+applyMiddleware({
+  before: (context, next) => {
+    console.log('suming-log', context[0]);  //options
+    next();
+  },
+  after: (context, next) => {
+    console.log('suming-log', context[0]);  //options
+    console.log('suming-log', context[1]);  //result
+    context[1].hook = true;
+    next();
+  }
+});
+
+
 function buildOptions(props) {
   return {
     baiduFetch: 'https://www.baidu.com/',
-    userFetch: '/users',
+    usersFetch: '/users',
     updateUser: () => ({
       updateUserFetch: {
         url: '/users/update',
@@ -36,7 +51,7 @@ function App(props) {
   let updateUserMap = options.updateUser();
   let updateUserOptions = Object.keys(updateUserMap).map(key => updateUserMap[key]);
   let [result, updateUser] = useFetch(updateUserOptions, [props.name, props.age]);
-  let lazyResult = useLazyFetch(options.userFetch, [props.name, props.age]);
+  let lazyResult = useLazyFetch(options.usersFetch, [props.name, props.age]);
   console.log('suming-log', lazyResult);
   return (
     <div className="App">

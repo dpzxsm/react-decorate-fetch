@@ -1,5 +1,3 @@
-import { compose } from "./middleware.js";
-
 const defaults = {
   fetchOptions: {
     method: 'GET',
@@ -20,7 +18,8 @@ const defaults = {
     } else {
       return {};
     }
-  }
+  },
+  fetch: getTopFetch()
 };
 
 const fetchInitKeys = ['method', 'headers', 'body', 'mode', 'credentials', 'cache', 'redirect', 'referrer', 'referrerPolicy', 'integrity'];
@@ -75,18 +74,21 @@ function getTopFetch() {
 }
 
 function buildFetch(url, options = {}) {
-  let topFetch = getTopFetch();
-  let { params = {}, isForm, ...otherOptions } = options;
-  otherOptions = filterOptions(otherOptions);
-  let { host, ...fetchOptions } = defaults.fetchOptions;
+  // filter params and postFormParams
+  let { params = {}, postFormParams, ...finalOptions } = options;
+  finalOptions = filterOptions(finalOptions);
+  // filter host and globalParam
+  let { host, globalParams = {}, ...fetchOptions } = defaults.fetchOptions;
   if (!url.match(/https?:\/\//) && host) {
     url = host + url;
   }
-  otherOptions.headers = Object.assign({}, options.headers || {}, fetchOptions.headers);
-  otherOptions.method = options.method || fetchOptions.method;
-  let globalParams = fetchOptions.globalParams ? fetchOptions.globalParams : {};
-  params = Object.assign({}, params, globalParams);
-  if (otherOptions.method === 'GET') {
+  // header is special merge
+  finalOptions.headers = Object.assign({}, finalOptions.headers || {}, fetchOptions.headers);
+  // merge options
+  finalOptions = Object.assign(fetchOptions, finalOptions);
+
+  params = Object.assign({}, globalParams, params);
+  if (finalOptions.method === 'GET') {
     let query = buildQuery(params);
     if (query) {
       if (url.match(/https?:\/\/.*\?/)) {
@@ -95,57 +97,40 @@ function buildFetch(url, options = {}) {
         url = url + '?' + buildQuery(params);
       }
     }
-  } else if (otherOptions.method === 'POST' && !otherOptions.body) {
-    if (otherOptions.transformFormData)
-      if (isForm) {
+  } else if (finalOptions.method === 'POST' && !finalOptions.body) {
+    if (finalOptions.transformFormData)
+      if (postFormParams) {
         let formData = new FormData();
         Object.keys(params).forEach(key => {
           formData.append(key, params[key]);
         });
-        otherOptions.body = formData;
+        finalOptions.body = formData;
       } else {
         // default transform json
-        otherOptions.body = JSON.stringify(params);
+        finalOptions.body = JSON.stringify(params);
       }
   }
-  return topFetch(url, otherOptions).then((res) => {
+  let topFetch = defaults.fetch || getTopFetch();
+  return topFetch(url, finalOptions).then((res) => {
     return defaults.buildResponse(res);
   });
 }
 
-function initConfig({ options = {}, mapResponse }) {
-  if (typeof options === 'object') {
-    defaults.fetchOptions = Object.assign(defaults.fetchOptions, options);
+function initConfig({ fetchOptions = {}, buildResponse, fetch }) {
+  if (typeof fetchOptions === 'object') {
+    defaults.fetchOptions = Object.assign(defaults.fetchOptions, fetchOptions);
   }
-  if (Function.prototype.isPrototypeOf(mapResponse)) {
-    defaults.buildResponse = mapResponse;
+  if (Function.prototype.isPrototypeOf(buildResponse)) {
+    defaults.buildResponse = buildResponse;
   }
-}
-
-function bindDomClick(func, verification) {
-  return function (event) {
-    // get params from event
-    let params = {};
-    if (event && event.currentTarget) {
-      let dataset = event.currentTarget.dataset || {};
-      params = {
-        ...dataset
-      };
-    }
-    if (verification) {
-      if (typeof verification === 'function') {
-        if (!verification(params)) return;
-      } else {
-        return;
-      }
-    }
-    return func(params);
-  };
+  if (fetch) {
+    console.log('global fetch api is change');
+    defaults.fetch = fetch;
+  }
 }
 
 export {
   omitChildren,
   buildFetch,
-  initConfig,
-  bindDomClick
+  initConfig
 };
