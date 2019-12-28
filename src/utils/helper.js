@@ -19,6 +19,9 @@ const defaults = {
       return {};
     }
   },
+  transformPostParams: function (params) {
+    return JSON.stringify(params);
+  },
   fetch: getTopFetch()
 };
 
@@ -74,8 +77,7 @@ function getTopFetch() {
 }
 
 function buildFetch(url, options = {}) {
-  // filter params and postFormParams
-  let { params = {}, postFormParams, ...finalOptions } = options;
+  let { params = {}, ...finalOptions } = options;
   finalOptions = filterOptions(finalOptions);
   // filter host and globalParam
   let { host, globalParams = {}, ...fetchOptions } = defaults.fetchOptions;
@@ -83,7 +85,7 @@ function buildFetch(url, options = {}) {
     url = host + url;
   }
   // header is special merge
-  finalOptions.headers = Object.assign({}, finalOptions.headers || {}, fetchOptions.headers);
+  finalOptions.headers = Object.assign({}, fetchOptions.headers, finalOptions.headers || {});
   // merge options
   finalOptions = Object.assign(fetchOptions, finalOptions);
 
@@ -98,17 +100,8 @@ function buildFetch(url, options = {}) {
       }
     }
   } else if (finalOptions.method === 'POST' && !finalOptions.body) {
-    if (finalOptions.transformFormData)
-      if (postFormParams) {
-        let formData = new FormData();
-        Object.keys(params).forEach(key => {
-          formData.append(key, params[key]);
-        });
-        finalOptions.body = formData;
-      } else {
-        // default transform json
-        finalOptions.body = JSON.stringify(params);
-      }
+    let transformPostParams = defaults.transformPostParams;
+    finalOptions.body = transformPostParams(params, finalOptions);
   }
   let topFetch = defaults.fetch || getTopFetch();
   return topFetch(url, finalOptions).then((res) => {
@@ -116,12 +109,15 @@ function buildFetch(url, options = {}) {
   });
 }
 
-function initConfig({ fetchOptions = {}, buildResponse, fetch }) {
+function initConfig({ fetchOptions = {}, buildResponse, transformPostParams, fetch }) {
   if (typeof fetchOptions === 'object') {
     defaults.fetchOptions = Object.assign(defaults.fetchOptions, fetchOptions);
   }
   if (Function.prototype.isPrototypeOf(buildResponse)) {
     defaults.buildResponse = buildResponse;
+  }
+  if (Function.prototype.isPrototypeOf(transformPostParams)) {
+    defaults.transformPostParams = transformPostParams;
   }
   if (fetch) {
     console.log('global fetch api is change');

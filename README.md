@@ -108,6 +108,7 @@ initConfig({
   fetchOptions: {
     host: 'http://xxx.com',
     globalParams: { version:'1.0', token: '69c5fcebaa65b560eaf06c3fbeb481ae44b8d618'},
+    headers: {}, //override default headers
     ...otherFetchOptions
   },
   buildResponse: (res) => {
@@ -124,6 +125,10 @@ initConfig({
        return {};
      }
   },
+  transformPostParams: (params) => {
+    // This is default transform, you can override it.
+    return JSON.stringify(params)
+  }, // transform params Option
   fetch: require('axios') // you can replace to any you like Fetch Api's library
 })
 ```

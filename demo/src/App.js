@@ -6,7 +6,16 @@ import { initConfig, connect, useLazyFetch, useFetch, applyMiddleware } from 're
 // similar to react-refetch's connect.defaults
 initConfig({
   fetchOptions: {
-    host: 'http://' + process.env.HOST // replace your host
+    host: 'http://' + process.env.HOST, // host
+    globalParams: { version: '1.0.0' }, //globalParams,
+    headers: {}, //override default headers
+  },
+  transformPostParams: (params, options) => {
+    let formData = new FormData();
+    Object.keys(params).forEach(key => {
+      formData.append(key, params[key]);
+    });
+    return formData
   }
 });
 
@@ -28,7 +37,10 @@ applyMiddleware({
 function buildOptions(props) {
   return {
     baiduFetch: 'https://www.baidu.com/',
-    usersFetch: '/users',
+    usersFetch: {
+      url: '/users',
+      method: 'POST'
+    },
     updateUser: () => ({
       updateUserFetch: {
         url: '/users/update',
