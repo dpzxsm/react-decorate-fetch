@@ -155,6 +155,9 @@ applyMiddleware(plugin)
 removeMiddleware(plugin)
 ```
 
+### Chaining Requests
+### Mock Fetch Data
+
 ### Type Explanation
 #### FetchOptions
 `FetchOptions` based on Fetch API’s options, so you can use all Fetch API’s options

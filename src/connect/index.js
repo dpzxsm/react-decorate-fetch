@@ -11,7 +11,6 @@ export default function (mapRequestToProps, defaults, options) {
     let mapRequest = Object.assign({}, mapRequestToProps);
     mapRequestToProps = () => mapRequest;
   }
-  defaults = Object.assign({}, defaults);
   options = Object.assign({ withRef: false }, options);
   return function (WrappedComponent) {
     class ConnectComponent extends Component {
@@ -31,7 +30,7 @@ export default function (mapRequestToProps, defaults, options) {
             requests[key] = (params) => {
               let childMappings = options(params);
               let childRequests = Object.keys(childMappings).map(key => {
-                let request = mapRequestByOptions(childMappings[key]);
+                let request = mapRequestByOptions(childMappings[key], defaults);
                 return ({
                   key,
                   request
@@ -64,7 +63,7 @@ export default function (mapRequestToProps, defaults, options) {
             };
             lazyRequest.push({
               key,
-              request: mapRequestByOptions(options)
+              request: mapRequestByOptions(options, defaults)
             });
           }
         });

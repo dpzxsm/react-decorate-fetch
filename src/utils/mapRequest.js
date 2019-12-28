@@ -52,16 +52,23 @@ function makeRequest(options = {}) {
   };
 }
 
-function mapRequestByOptions(options) {
+function mapRequestByOptions(options, defaults = {}) {
   if (typeof options === "string") {
     return makeRequest({
+      ...defaults,
       url: options,
       method: 'GET'
     });
   } else if (isPlainObject(options)) {
-    return makeRequest({ ...options });
+    return makeRequest({
+      ...defaults,
+      ...options
+    });
   } else if (Array.isArray(options)) {
-    return () => Promise.all(options.map(item => makeRequest(item)()));
+    return () => Promise.all(options.map(item => makeRequest({
+      ...defaults,
+      ...item
+    })()));
   } else {
     return () => Promise.reject("Not Support the Request Type");
   }
