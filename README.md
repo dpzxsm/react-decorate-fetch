@@ -54,7 +54,6 @@ withRef options to ref connect Component like `react-redux`
 ```javascript
 let [fetchState, fetchFunction] = useFetch(fetchOptions, deps);
 let lazyFetchState = useLazyFetch(fetchOptions, deps);
-let lazyFetchStates = useLazyFetches([fetchOptions, fetchOptions], deps);
 ```
 ##### useFetch(options:[FetchOptions](#FetchOptions), deps?: any[]);
 ```javascript
@@ -88,18 +87,7 @@ const APP = (props) => {
   </div>
 }
 ```
-##### useLazyFetches(options:[FetchOptions](#FetchOptions)[] , deps?: any[]);
-```javascript
-const APP = (props) => {
-  const fetchOptions1 = "/users";
-  const fetchOptions2 = "/schools";
-  const [fetchState1, fetchState2] = useLazyFetches([fetchOptions1, fetchOptions2], []);
-  return <div>
-     {JSON.stringify(fetchState1)}
-     {JSON.stringify(fetchState2)}
-  </div>
-}
-```
+
 ### Global and Middleware
 If you want to config some Global options for all fetches, you will need some useful api to resolve it. It is not necessary, but is helpful.
 #### initConfig

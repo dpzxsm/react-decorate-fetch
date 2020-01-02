@@ -63,7 +63,7 @@ function App(props) {
   let updateUserMap = options.updateUser();
   let updateUserOptions = Object.keys(updateUserMap).map(key => updateUserMap[key]);
   let [result, updateUser] = useFetch(updateUserOptions, [props.name, props.age]);
-  let lazyResult = useLazyFetch(options.usersFetch, [props.name, props.age]);
+  let lazyResult = useLazyFetch([options.usersFetch, options.usersFetch], [props.name, props.age]);
   console.log('suming-log', lazyResult);
   return (
     <div className="App">
