@@ -4,7 +4,9 @@ import useFetch from "./useFetch";
 export default function useLazyFetch(options, deps) {
   let [state, callback] = useFetch(options, deps);
   useEffect(() => {
-    callback();
+    callback().then((err) => {
+      //do nothing
+    });
   }, [callback]);
   return state;
 }

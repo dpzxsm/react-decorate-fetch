@@ -4,7 +4,8 @@ import useRequest from "./useRequest";
 import useForceUpdate from "./useForceUpdate";
 
 export default function useFetch(options, deps = [], isForceUpdate = true) {
-  let request = mapRequestByOptions(options);
+  let { refreshInterval, ...otherOptions } = options;
+  let request = mapRequestByOptions(otherOptions);
   const forceUpdate = useForceUpdate();
   let [state, callback] = useRequest(request, deps);
   let newCallback = useCallback(() => {
@@ -16,6 +17,14 @@ export default function useFetch(options, deps = [], isForceUpdate = true) {
       isForceUpdate && forceUpdate();
       return data;
     });
+  }, [callback]);
+  useEffect(() => {
+    if (refreshInterval && Number.isInteger(refreshInterval)) {
+      let timer = setInterval(() => {
+        newCallback();
+      }, refreshInterval);
+      return () => clearInterval(timer);
+    }
   }, [callback]);
   return [state, newCallback];
 }
