@@ -17,7 +17,10 @@ function makeRequest(options = {}) {
         }
         request.then((result) => {
           if (then) {
-            return mapRequestByOptions(then(result))();
+            let thenOptions = then(result);
+            if (thenOptions) {
+              return mapRequestByOptions(thenOptions)();
+            }
           }
           let data = result;
           if (Function.prototype.isPrototypeOf(value)) {
@@ -29,7 +32,7 @@ function makeRequest(options = {}) {
             error: false,
             success: true,
             code: 200,
-            message: successText || '请求成功',
+            message: successText || 'Success',
             value: data
           };
         }).catch((error) => {
@@ -39,7 +42,7 @@ function makeRequest(options = {}) {
             error: true,
             success: false,
             code: error.code || 0,
-            message: error.message,
+            message: typeof error === 'string' ? error : (error.message || error.toString()),
             value: null
           };
         }).then((data) => {

@@ -22,13 +22,13 @@ initConfig({
 // hook fetch result
 applyMiddleware({
   before: (context, next) => {
-    console.log('suming-log', context[0]);  //options
+    // console.log('suming-log', context[0]);  //options
     next();
   },
   after: (context, next) => {
-    console.log('suming-log', context[0]);  //options
-    console.log('suming-log', context[1]);  //result
-    context[1].hook = true;
+    // console.log('suming-log', context[0]);  //options
+    // console.log('suming-log', context[1]);  //result
+    // context[1].hook = true;
     next();
   }
 });
@@ -39,7 +39,12 @@ function buildOptions(props) {
     baiduFetch: 'https://www.baidu.com/',
     usersFetch: {
       url: '/users',
-      method: 'POST'
+      method: 'POST',
+      then: (data) => {
+      },
+      value: [], // Mock static data
+      // value: (data) =>data.join(','), // map fetch data
+      refreshInterval: 2000
     },
     updateUser: () => ({
       updateUserFetch: {
@@ -63,7 +68,7 @@ function App(props) {
   let updateUserMap = options.updateUser();
   let updateUserOptions = Object.keys(updateUserMap).map(key => updateUserMap[key]);
   let [result, updateUser] = useFetch(updateUserOptions, [props.name, props.age]);
-  let lazyResult = useLazyFetch([options.usersFetch, options.usersFetch], [props.name, props.age]);
+  let lazyResult = useLazyFetch(options.usersFetch, [props.name, props.age]);
   console.log('suming-log', lazyResult);
   return (
     <div className="App">
