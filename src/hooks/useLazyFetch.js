@@ -5,13 +5,12 @@ export default function useLazyFetch(options, deps) {
   let [state, callback] = useFetch(options, deps);
   let refreshInterval = options.refreshInterval || 0;
   useEffect(() => {
+    callback().then((err) => {
+      //do nothing
+    });
     if (refreshInterval) {
       let timer = setInterval(callback, refreshInterval);
       return () => clearInterval(timer);
-    } else {
-      callback().then((err) => {
-        //do nothing
-      });
     }
   }, [callback]);
   return state;

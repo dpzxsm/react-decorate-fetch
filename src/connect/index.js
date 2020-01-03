@@ -63,6 +63,7 @@ export default function (mapRequestToProps, defaults, options) {
             };
             lazyRequest.push({
               key,
+              options,
               request: mapRequestByOptions(options, defaults)
             });
           }
@@ -125,6 +126,31 @@ export default function (mapRequestToProps, defaults, options) {
             responses: finalResponses
           });
         });
+
+        this._timers = lazyRequest.map(item => {
+          let refreshInterval = item.options.refreshInterval || 0;
+          if (refreshInterval && Number.isInteger(refreshInterval)) {
+            return setInterval(() => {
+              this.initialResponsesState([item]);
+              item.request().then(response => {
+                this.setState(pre => {
+                  return {
+                    responses: {
+                      ...pre.responses,
+                      [item.key]: response
+                    }
+                  };
+                });
+              });
+            }, refreshInterval);
+          } else {
+            return null;
+          }
+        });
+      }
+
+      componentWillUnmount() {
+        this._timers && this._timers.forEach(timer => clearInterval(timer));
       }
 
       render() {
