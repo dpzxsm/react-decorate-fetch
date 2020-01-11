@@ -8,15 +8,12 @@ export default function useFetch(options, deps = [], isForceUpdate = true) {
   const forceUpdate = useForceUpdate();
   let [state, callback] = useRequest(request, deps);
   let newCallback = useCallback(() => {
-    if (state.loading) {
-      return Promise.resolve(false);
-    }
     let promise = callback();
     isForceUpdate && forceUpdate();
     return promise.then((data) => {
       isForceUpdate && forceUpdate();
       return data;
     });
-  }, [state, callback]);
+  }, [callback]);
   return [state, newCallback];
 }
