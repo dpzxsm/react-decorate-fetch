@@ -3,8 +3,17 @@ import { buildFetch } from "./helper.js";
 import isPlainObject from "./isPlainObject.js";
 
 function makeRequest(options = {}) {
-  return function () {
+  return function (params = {}) {
     let { url, value, then, andThen, successText, ...otherOptions } = options;
+    // support modify params
+    if (otherOptions.params) {
+      otherOptions.params = {
+        ...otherOptions.params,
+        ...params
+      };
+    } else {
+      otherOptions.params = params;
+    }
     return new Promise((resolve) => {
       compose('before')([options], () => {
         let request;

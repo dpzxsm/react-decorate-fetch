@@ -9,7 +9,7 @@ export default function useRequest(fn, deps = [], initialState = {
   const state = useRef(initialState);
   const isMounted = useMountedState();
 
-  const callback = useCallback(() => {
+  const callback = useCallback((...args) => {
     const callId = ++lastCallId.current;
 
     state.current = {
@@ -17,7 +17,7 @@ export default function useRequest(fn, deps = [], initialState = {
       loading: true
     };
 
-    return fn().then(
+    return fn(...args).then(
       value => {
         if (isMounted() && callId === lastCallId.current) {
           state.current = value;

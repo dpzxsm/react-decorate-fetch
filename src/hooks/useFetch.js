@@ -7,8 +7,8 @@ export default function useFetch(options, deps = [], isForceUpdate = true) {
   let request = mapRequestByOptions(options);
   const forceUpdate = useForceUpdate();
   let [state, callback] = useRequest(request, deps);
-  let newCallback = useCallback(() => {
-    let promise = callback();
+  let newCallback = useCallback((...args) => {
+    let promise = callback(...args);
     isForceUpdate && forceUpdate();
     return promise.then((data) => {
       isForceUpdate && forceUpdate();
