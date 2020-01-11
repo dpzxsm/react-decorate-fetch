@@ -17,6 +17,6 @@ export default function useFetch(options, deps = [], isForceUpdate = true) {
       isForceUpdate && forceUpdate();
       return data;
     });
-  }, [callback]);
+  }, [state, callback]);
   return [state, newCallback];
 }
