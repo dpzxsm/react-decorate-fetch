@@ -14,7 +14,7 @@ function makeRequest(options = {}) {
     } else {
       otherOptions.params = params;
     }
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       compose('before')([options], () => {
         let request;
         if (value && !Function.prototype.isPrototypeOf(value)) {
@@ -56,7 +56,11 @@ function makeRequest(options = {}) {
           };
         }).then((data) => {
           compose('after')([options, data], () => {
-            resolve(data);
+            if (data.success) {
+              resolve(data);
+            } else {
+              reject(data);
+            }
           });
         });
       });

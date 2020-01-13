@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import useMountedState from './useMountedState';
+import { FetchError } from "../utils/helper";
 
 export default function useRequest(fn, deps = [], initialState = {
   status: 'pending',
@@ -22,13 +23,13 @@ export default function useRequest(fn, deps = [], initialState = {
         if (isMounted() && callId === lastCallId.current) {
           state.current = value;
         }
-        return value;
+        return value.value;
       },
       error => {
         if (isMounted() && callId === lastCallId.current) {
           state.current = error;
         }
-        return error;
+        throw new FetchError(error);
       }
     );
   }, deps);

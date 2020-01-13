@@ -13,6 +13,9 @@ export default function useFetch(options, deps = [], isForceUpdate = true) {
     return promise.then((data) => {
       isForceUpdate && forceUpdate();
       return data;
+    }).catch((error) => {
+      isForceUpdate && forceUpdate();
+      throw error;
     });
   }, [callback]);
   return [state, newCallback];

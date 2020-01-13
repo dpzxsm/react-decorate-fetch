@@ -125,7 +125,24 @@ function initConfig({ fetchOptions = {}, buildResponse, transformPostParams, fet
   }
 }
 
+class FetchError {
+  constructor(error) {
+    if (typeof error === 'string') {
+      this.message = error;
+      this.code = 0;
+    } else {
+      this.message = error.message;
+      this.code = error.code || 0;
+    }
+  }
+
+  toString() {
+    return this.message;
+  }
+}
+
 export {
+  FetchError,
   omitChildren,
   buildFetch,
   initConfig

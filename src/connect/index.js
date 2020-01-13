@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
-import { omitChildren } from '../utils/helper';
+import { FetchError, omitChildren } from '../utils/helper';
 import isPlainObject from "../utils/isPlainObject";
 import shallowEqual from "../utils/shallowEqual";
 import { mapRequestByOptions } from "../utils/mapRequest";
@@ -49,10 +49,17 @@ export default function (mapRequestToProps, defaults, options) {
                     ...pre.responses, ...finalResponses
                   }
                 }));
-                if (results.length > 0) {
-                  return results;
+                results.forEach((item) => {
+                  if (item.error) {
+                    throw new FetchError(item);
+                  }
+                });
+                if (results.length > 1) {
+                  return results.map(item => item.value);
+                } else if (results.length === 1) {
+                  return results[0].value;
                 } else {
-                  return results[0];
+                  return null;
                 }
               });
             };

@@ -1,6 +1,6 @@
 {
   "name": "react-decorate-fetch",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A library to fetch data for React Components, which has most of the similar API with [react-refetch] Different, it also supports more friendly way to use, like Hooks.",
   "main": "lib/index.js",
   "scripts": {

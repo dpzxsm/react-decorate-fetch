@@ -1,3 +1,5 @@
+import { FetchError } from "./helper";
+
 const middlewares = [];
 
 /**
@@ -7,7 +9,7 @@ export function applyMiddleware(plugin) {
   // check middlewares
   Object.keys(plugin).forEach((key) => {
     if (typeof plugin[key] !== "function") {
-      throw new Error("The Middleware's action must be function!");
+      throw new FetchError("The Middleware's action must be function!");
     }
   });
   middlewares.push(plugin);
