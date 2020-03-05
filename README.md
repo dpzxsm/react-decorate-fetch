@@ -167,6 +167,7 @@ removeMiddleware(plugin)
 | **then**      | Function | Chaining Requests | false | —— |
 | **host**      | String   | Define the host, only use in [initConfig](#initConfig) | false | —— |
 | **globalParams**| String | Define default params, only use in [initConfig](#initConfig) | false | —— |
+
 Support all other Fetch API’s options, like `body`,`mode`,`credentials`,`cache`,`redirect`,`referrer`,`referrerPolicy`,`integrity`.
 
 #### FetchState 
