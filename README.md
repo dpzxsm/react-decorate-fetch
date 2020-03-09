@@ -165,6 +165,7 @@ removeMiddleware(plugin)
 | **refreshInterval** | number  | Interval in milliseconds to poll for new data from the URL | false | 0 |
 | **value**     | Function\|Any | Static response’s value or function to transform the old response’s value | false | —— |
 | **then**      | Function | Chaining Requests | false | —— |
+| **delay**      | Number | Fetch delay millisecond| —— |0 | —— |
 | **host**      | String   | Define the host, only use in [initConfig](#initConfig) | false | —— |
 | **globalParams**| String | Define default params, only use in [initConfig](#initConfig) | false | —— |
 

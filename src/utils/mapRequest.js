@@ -4,7 +4,7 @@ import isPlainObject from "./isPlainObject.js";
 
 function makeRequest(options = {}) {
   return function (params = {}) {
-    let { url, value, then, andThen, successText, ...otherOptions } = options;
+    let { url, value, delay = 0, then, andThen, successText, ...otherOptions } = options;
     // support modify params
     if (otherOptions.params) {
       otherOptions.params = {
@@ -56,11 +56,13 @@ function makeRequest(options = {}) {
           };
         }).then((data) => {
           compose('after')([options, data], () => {
-            if (data.success) {
-              resolve(data);
-            } else {
-              reject(data);
-            }
+            setTimeout(() => {
+              if (data.success) {
+                resolve(data);
+              } else {
+                reject(data);
+              }
+            }, delay);
           });
         });
       });
