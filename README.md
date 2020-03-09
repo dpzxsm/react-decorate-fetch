@@ -95,6 +95,7 @@ const APP = (props) => {
 
 ### Global and Middleware
 If you want to config some Global options for all fetches, you will need some useful api to resolve it. It is not necessary, but is helpful.
+
 #### initConfig
 ```javascript
 initConfig({
@@ -149,7 +150,10 @@ removeMiddleware(plugin)
 ```
 
 ### Chaining Requests
+You can set a function to [FetchOptions](#FetchOptions)'s `then`, and return a new [FetchOptions](#FetchOptions).
+
 ### Mock Fetch Data
+You can set Mock data to [FetchOptions](#FetchOptions)'s `value`,  you will receive the Mock data and no request real server.
 
 ### Type Explanation
 #### FetchOptions
@@ -162,9 +166,9 @@ removeMiddleware(plugin)
 | **headers**   | Object   | The Fetch API’s headers | false | { 'Accept': 'application/json', 'Content-Type': 'application/json' } |
 | **params**    | Object   | Common params for different `method`| false | {} |
 | **successText** | string   | Custom fetch success text | false | "Success" |
-| **refreshInterval** | number  | Interval in milliseconds to poll for new data from the URL | false | 0 |
+| **refreshInterval** | number  | Interval in milliseconds to poll for new data from the URL, set 0 can stop request | false | 0 |
 | **value**     | Function\|Any | Static response’s value or function to transform the old response’s value | false | —— |
-| **then**      | Function | Chaining Requests | false | —— |
+| **then**      | Function | [Chaining Requests](#Chaining Requests) | false | —— |
 | **delay**      | Number | Fetch delay millisecond| —— |0 | —— |
 | **host**      | String   | Define the host, only use in [initConfig](#initConfig) | false | —— |
 | **globalParams**| String | Define default params, only use in [initConfig](#initConfig) | false | —— |
