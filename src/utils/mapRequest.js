@@ -56,8 +56,7 @@ function makeRequest(options = {}) {
             error: true,
             success: false,
             code: error.code || 0,
-            message: typeof error === 'string' ? error : (error.message || error.toString()),
-            value: null
+            message: typeof error === 'string' ? error : (error.message || error.toString())
           };
         }).then((data) => {
           compose('after')([options, data], () => {
