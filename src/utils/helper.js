@@ -4,7 +4,9 @@ const defaults = {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
-    }
+    },
+    delay: 0,
+    successText: 'Success',
   },
   buildResponse: function (res) {
     if (res && res.json) {
@@ -142,6 +144,7 @@ class FetchError {
 }
 
 export {
+  defaults,
   FetchError,
   omitChildren,
   buildFetch,

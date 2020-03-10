@@ -1,10 +1,15 @@
-import { compose } from "./middleware.js";
-import { buildFetch } from "./helper.js";
-import isPlainObject from "./isPlainObject.js";
+import { compose } from './middleware.js';
+import { defaults, buildFetch } from './helper.js';
+import isPlainObject from './isPlainObject.js';
 
 function makeRequest(options = {}) {
   return function (params = {}) {
-    let { url, value, delay = 0, then, andThen, successText, ...otherOptions } = options;
+    const defaultOptions = defaults.fetchOptions || {};
+    let {
+      url, then, andThen,
+      value = defaultOptions.value, delay = defaultOptions.delay, successText = defaultOptions.successText,
+      ...otherOptions
+    } = options;
     // support modify params
     if (otherOptions.params) {
       otherOptions.params = {
@@ -71,7 +76,7 @@ function makeRequest(options = {}) {
 }
 
 function mapRequestByOptions(options, defaults = {}) {
-  if (typeof options === "string") {
+  if (typeof options === 'string') {
     return makeRequest({
       ...defaults,
       url: options,
@@ -88,7 +93,7 @@ function mapRequestByOptions(options, defaults = {}) {
       ...item
     })()));
   } else {
-    return () => Promise.reject("Not Support the Request Type");
+    return () => Promise.reject('Not Support the Request Type');
   }
 }
 
