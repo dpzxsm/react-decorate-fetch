@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import useFetch from "./useFetch";
+import useFetch from './useFetch';
 
 export default function useLazyFetch(options, deps) {
-  let [state, callback] = useFetch(options, deps);
+  let [state, callback] = useFetch(options, deps, true);
   let refreshInterval = options.refreshInterval || 0;
   useEffect(() => {
     callback().then((err) => {
