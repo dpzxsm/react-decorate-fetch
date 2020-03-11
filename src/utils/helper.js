@@ -7,6 +7,7 @@ const defaults = {
     },
     delay: 0,
     successText: 'Success',
+    cleanParams: true
   },
   buildResponse: function (res) {
     if (res && res.json) {
@@ -92,6 +93,16 @@ function buildFetch(url, options = {}) {
   finalOptions = Object.assign(fetchOptions, finalOptions);
 
   params = Object.assign({}, globalParams, params);
+
+  // clean params, like null, undefined
+  if (finalOptions.cleanParams) {
+    Object.keys(params).forEach(key => {
+      if (params[key] === undefined || params[key] === null) {
+        delete params[key];
+      }
+    })
+  }
+
   if (finalOptions.method === 'GET') {
     let query = buildQuery(params);
     if (query) {

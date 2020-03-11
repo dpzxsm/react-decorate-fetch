@@ -170,6 +170,7 @@ You can set Mock data to [FetchOptions](#FetchOptions)'s `value`,  you will rece
 | **value**     | Function\|Any | Static response’s value or function to transform the old response’s value | false | —— |
 | **then**      | Function | [Chaining Requests](#Chaining Requests) | false | —— |
 | **delay**      | Number | Fetch delay millisecond| —— |0 | —— |
+| **cleanParams**      | Boolean | Clean undefined or null params | —— | true | —— |
 | **host**      | String   | Define the host, only use in [initConfig](#initConfig) | false | —— |
 | **globalParams**| String | Define default params, only use in [initConfig](#initConfig) | false | —— |
 
