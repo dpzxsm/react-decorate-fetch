@@ -39,7 +39,7 @@ export default function (mapRequestToProps, defaults, options) {
               this.initialResponsesState(childRequests);
               let finalResponses = {};
               return Promise.all(childRequests.map(item => {
-                return item.request().then(response => {
+                return item.request().promise.then(response => {
                   finalResponses[item.key] = response;
                   return response;
                 });
@@ -119,7 +119,7 @@ export default function (mapRequestToProps, defaults, options) {
         let finalResponses = Object.assign({}, responses);
         // 设置成功和失败
         Promise.all(lazyRequest.map(item => {
-          return item.request().then((response) => {
+          return item.request().promise.then((response) => {
             finalResponses[item.key] = response;
           }).catch((error) => {
             finalResponses[item.key] = error;
@@ -139,7 +139,7 @@ export default function (mapRequestToProps, defaults, options) {
           if (refreshInterval && Number.isInteger(refreshInterval)) {
             return setInterval(() => {
               this.initialResponsesState([item]);
-              item.request().then(response => {
+              item.request().promise.then(response => {
                 this.setState(pre => {
                   return {
                     responses: {

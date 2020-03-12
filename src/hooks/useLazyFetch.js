@@ -10,6 +10,7 @@ export default function useLazyFetch(options, deps) {
     });
     if (refreshInterval) {
       let timer = setInterval(callback, refreshInterval);
+      state.cancel && state.cancel();
       return () => clearInterval(timer);
     }
   }, [callback]);
