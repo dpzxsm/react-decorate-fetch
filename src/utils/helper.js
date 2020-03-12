@@ -103,6 +103,13 @@ function buildFetch(url, options = {}) {
     })
   }
 
+  // set signal
+  let controller;
+  if (window.AbortController) {
+    controller = new window.AbortController();
+    finalOptions.signal = controller.signal;
+  }
+
   if (finalOptions.method === 'GET') {
     let query = buildQuery(params);
     if (query) {
@@ -117,9 +124,12 @@ function buildFetch(url, options = {}) {
     finalOptions.body = transformPostParams(params, finalOptions);
   }
   let topFetch = defaults.fetch || getTopFetch();
-  return topFetch(url, finalOptions).then((res) => {
-    return defaults.buildResponse(res);
-  });
+  return {
+    promise: topFetch(url, finalOptions).then((res) => {
+      return defaults.buildResponse(res);
+    }),
+    cancel: () => controller && controller.abort()
+  }
 }
 
 function initConfig({ fetchOptions = {}, buildResponse, transformPostParams, fetch }) {

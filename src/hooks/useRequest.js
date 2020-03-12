@@ -1,24 +1,21 @@
 import { useCallback, useRef } from 'react';
 import useMountedState from './useMountedState';
-import { FetchError } from "../utils/helper";
+import { FetchError } from '../utils/helper';
 
-export default function useRequest(fn, deps = [], initialState = {
-  status: 'pending',
-  loading: false
-}) {
+export default function useRequest(fn, deps = [], initialState) {
   const lastCallId = useRef(0);
   const state = useRef(initialState);
   const isMounted = useMountedState();
 
   const callback = useCallback((...args) => {
     const callId = ++lastCallId.current;
-
+    let promise = fn(...args);
     state.current = {
       status: 'loading',
-      loading: true
+      loading: true,
+      cancel: promise.cancel
     };
-
-    return fn(...args).then(
+    return promise.then(
       value => {
         if (isMounted() && callId === lastCallId.current) {
           state.current = value;

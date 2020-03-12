@@ -19,17 +19,17 @@ function makeRequest(options = {}) {
     } else {
       otherOptions.params = params;
     }
-    return new Promise((resolve, reject) => {
+    let request = {};
+    let promise = new Promise(function (resolve, reject) {
       compose('before')([options], () => {
-        let request;
         if (value && !Function.prototype.isPrototypeOf(value)) {
-          request = Promise.resolve(value);
+          request.promise = Promise.resolve(value);
         } else if (url) {
           request = buildFetch(url, otherOptions);
         } else {
-          request = Promise.reject('Must have url or value !');
+          request.promise = Promise.reject('Must have url or value !');
         }
-        request.then((result) => {
+        request.promise.then((result) => {
           if (then) {
             let thenOptions = then(result);
             if (thenOptions) {
@@ -71,6 +71,10 @@ function makeRequest(options = {}) {
         });
       });
     });
+    promise.cancel = function () {
+      request.cancel && request.cancel();
+    };
+    return promise;
   };
 }
 
