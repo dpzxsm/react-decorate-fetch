@@ -47,7 +47,8 @@ function makeRequest(options = {}) {
             success: true,
             code: 200,
             message: successText || 'Success',
-            value: data
+            value: data,
+            cancel:() =>{}
           };
         }).catch((error) => {
           return {
@@ -56,7 +57,8 @@ function makeRequest(options = {}) {
             error: true,
             success: false,
             code: error.code || 0,
-            message: typeof error === 'string' ? error : (error.message || error.toString())
+            message: typeof error === 'string' ? error : (error.message || error.toString()),
+            cancel:() =>{}
           };
         }).then((data) => {
           setTimeout(() => {
@@ -72,6 +74,7 @@ function makeRequest(options = {}) {
       });
     });
     promise.cancel = function () {
+      console.error('Request has be cancel !');
       request.cancel && request.cancel();
     };
     return promise;

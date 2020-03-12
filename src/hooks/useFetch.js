@@ -6,12 +6,15 @@ import useForceUpdate from './useForceUpdate';
 const LazyInitialState = {
   status: 'loading',
   loading: true,
-  cancel: function () {}
+  cancel: function () {
+  }
 };
+
 const DefaultInitialState = {
   status: 'pending',
   loading: false,
-  cancel: function () {}
+  cancel: function () {
+  }
 };
 
 export default function useFetch(options, deps = [], lazy) {
@@ -20,7 +23,7 @@ export default function useFetch(options, deps = [], lazy) {
   let [state, callback] = useRequest(request, deps, lazy ? LazyInitialState : DefaultInitialState);
   let newCallback = useCallback((...args) => {
     let promise = callback(...args);
-    !lazy && forceUpdate();
+    forceUpdate();
     return promise.then((data) => {
       forceUpdate();
       return data;
