@@ -59,15 +59,15 @@ function makeRequest(options = {}) {
             message: typeof error === 'string' ? error : (error.message || error.toString())
           };
         }).then((data) => {
-          compose('after')([options, data], () => {
-            setTimeout(() => {
+          setTimeout(() => {
+            compose('after')([options, data], () => {
               if (data.success) {
                 resolve(data);
               } else {
                 reject(data);
               }
-            }, delay);
-          });
+            });
+          }, delay)
         });
       });
     });
