@@ -186,3 +186,4 @@ Support all other Fetch API’s options, like `body`,`mode`,`credentials`,`cache
 | **code**      | Number   | Http status code | —— |
 | **message**   | String   | `FetchOptions`’s successText or error’s message | —— |
 | **value**     | Any      | When fetch success, that is `body` | null |
+| **cancel**    | Function | If request is fetching, cancel it | () => {} |
