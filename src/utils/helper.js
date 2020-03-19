@@ -22,13 +22,10 @@ const defaults = {
       return {};
     }
   },
-  transformPostParams: function (params) {
-    return JSON.stringify(params);
-  },
   fetch: getTopFetch()
 };
 
-const fetchInitKeys = ['method', 'headers', 'body', 'mode', 'credentials', 'cache', 'redirect', 'referrer', 'referrerPolicy', 'integrity'];
+const fetchInitKeys = ['method', 'headers', 'body', 'mode', 'credentials', 'cache', 'redirect', 'referrer', 'referrerPolicy', 'integrity', 'signal'];
 
 function omitChildren(obj) {
   const { children, ...rest } = obj;
@@ -81,18 +78,17 @@ function getTopFetch() {
 
 function buildFetch(url, options = {}) {
   let { params = {}, ...finalOptions } = options;
-  finalOptions = filterOptions(finalOptions);
-  // filter host and globalParam
-  let { host, globalParams = {}, ...fetchOptions } = defaults.fetchOptions;
+  // merge params
+  params = Object.assign({}, defaults.fetchOptions.params, params);
+  // merge special options
+  finalOptions.headers = Object.assign({}, defaults.fetchOptions.headers, finalOptions.headers);
+  // merge options
+  finalOptions = Object.assign({}, defaults.fetchOptions, finalOptions);
+
+  let host = finalOptions.host;
   if (!url.match(/https?:\/\//) && host) {
     url = host + url;
   }
-  // header is special merge
-  finalOptions.headers = Object.assign({}, fetchOptions.headers, finalOptions.headers || {});
-  // merge options
-  finalOptions = Object.assign(fetchOptions, finalOptions);
-
-  params = Object.assign({}, globalParams, params);
 
   // clean params, like null, undefined
   if (finalOptions.cleanParams) {
@@ -105,7 +101,7 @@ function buildFetch(url, options = {}) {
 
   // set signal
   let controller;
-  if (window.AbortController) {
+  if (window.AbortController && !finalOptions.signal) {
     controller = new window.AbortController();
     finalOptions.signal = controller.signal;
   }
@@ -121,8 +117,22 @@ function buildFetch(url, options = {}) {
     }
   } else if (finalOptions.method === 'POST' && !finalOptions.body) {
     let transformPostParams = defaults.transformPostParams;
-    finalOptions.body = transformPostParams(params, finalOptions);
+    if (transformPostParams) {
+      finalOptions.body = transformPostParams(params, finalOptions);
+    } else {
+      if (finalOptions.postForm) {
+        let formData = new FormData();
+        Object.keys(params).forEach(key => {
+          formData.append(key, params[key]);
+        });
+        finalOptions.body = formData;
+      } else {
+        finalOptions.body = JSON.stringify(params);
+      }
+    }
   }
+  // 筛选最终的fetch参数
+  finalOptions = filterOptions(finalOptions);
   let topFetch = defaults.fetch || getTopFetch();
   return {
     promise: topFetch(url, finalOptions).then((res) => {
