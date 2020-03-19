@@ -80,8 +80,6 @@ function buildFetch(url, options = {}) {
   let { params = {}, ...finalOptions } = options;
   // merge params
   params = Object.assign({}, defaults.fetchOptions.params, params);
-  // merge special options
-  finalOptions.headers = Object.assign({}, defaults.fetchOptions.headers, finalOptions.headers);
   // merge options
   finalOptions = Object.assign({}, defaults.fetchOptions, finalOptions);
 

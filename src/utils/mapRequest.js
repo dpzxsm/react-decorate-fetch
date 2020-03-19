@@ -30,15 +30,15 @@ function makeRequest(options = {}) {
           request.promise = Promise.reject('Must have url or value !');
         }
         request.promise.then((result) => {
-          if (then) {
-            let thenOptions = then(result);
-            if (thenOptions) {
-              return mapRequestByOptions(thenOptions)();
-            }
-          }
           let data = result;
           if (Function.prototype.isPrototypeOf(value)) {
             data = value(data);
+          }
+          if (then) {
+            let thenOptions = then(data);
+            if (thenOptions) {
+              return mapRequestByOptions(thenOptions)();
+            }
           }
           return {
             status: 'success',
