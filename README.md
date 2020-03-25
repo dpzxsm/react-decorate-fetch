@@ -101,7 +101,6 @@ If you want to config some Global options for all fetches, you will need some us
 initConfig({
   fetchOptions: {
     host: 'http://xxx.com',
-    globalParams: { version:'1.0', token: '69c5fcebaa65b560eaf06c3fbeb481ae44b8d618'},
     headers: {}, //override default headers
     ...otherFetchOptions
   },

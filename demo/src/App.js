@@ -8,7 +8,6 @@ import HocDemo from "./HocDemo";
 initConfig({
   fetchOptions: {
     host: 'http://' + process.env.HOST, // host
-    globalParams: { version: '1.0.0' }, //globalParams,
     headers: {}, //override default headers
   },
   transformPostParams: (params, options) => {
